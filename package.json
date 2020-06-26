@@ -1,6 +1,6 @@
 {
   "name": "skynet-telegram-bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Telegram bot written in Node.js for uploading stuff to Sia Skynet.",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,8 @@
   "homepage": "https://github.com/Delivator/skynet-telegram-bot#readme",
   "dependencies": {
     "axios": "^0.19.2",
-    "telegraf": "^3.38.0"
+    "telegraf": "^3.38.0",
+    "telegraf-ratelimit": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^7.3.1",
