@@ -1,0 +1,30 @@
+{
+  "name": "skynet-telegram-bot",
+  "version": "0.0.1",
+  "description": "A Telegram bot written in Node.js for uploading stuff to Sia Skynet.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Delivator/skynet-telegram-bot.git"
+  },
+  "keywords": [
+    "skynet",
+    "sia",
+    "siasky",
+    "telegram",
+    "telegrambot"
+  ],
+  "author": "Delivator",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Delivator/skynet-telegram-bot/issues"
+  },
+  "homepage": "https://github.com/Delivator/skynet-telegram-bot#readme",
+  "dependencies": {
+    "@nebulous/skynet": "^1.0.1",
+    "telegraf": "^3.38.0"
+  }
+}
