@@ -18,8 +18,9 @@ const limitConfig = {
 
 // takes a telegram file id, downloads the file and uploads it to skynet
 async function uploadFile(fileId, filename, ctx) {
+  let reply;
   try {
-    let reply = await ctx.reply(`Downloading file...`, {
+    reply = await ctx.reply(`Downloading file...`, {
       reply_to_message_id: ctx.message.message_id,
     });
     let url = await ctx.telegram.getFileLink(fileId); // get telegram file url
@@ -56,6 +57,15 @@ async function uploadFile(fileId, filename, ctx) {
       .catch(console.error);
   } catch (error) {
     console.error(error);
+    if (!reply) return;
+    // handle telegram 20mb donwload filesize limit
+    if (error.message === "400: Bad Request: file is too big")
+      ctx.telegram.editMessageText(
+        ctx.chat.id,
+        reply.message_id,
+        null,
+        "Error: File too big.\nTelegram has a 20MB filesize limit for bots."
+      );
   }
 }
 
@@ -81,6 +91,7 @@ async function uploadText(ctx) {
     .catch(console.error);
 }
 
+// telegraf bot events
 bot.start((ctx) => ctx.reply(settings.helpMsg));
 
 bot.use(rateLimit(limitConfig));
@@ -132,6 +143,7 @@ bot.on("text", (ctx) => {
   uploadText(ctx);
 });
 
+// start telegraf bot
 bot.launch().then(() => {
   console.log("Bot ready!");
   console.log(`Add me: https://t.me/${bot.options.username}`);
