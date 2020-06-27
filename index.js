@@ -98,6 +98,10 @@ bot.use(rateLimit(limitConfig));
 
 bot.help((ctx) => ctx.reply(settings.helpMsg));
 
+bot.command("source", (ctx) => {
+  ctx.reply("Source code: https://github.com/Delivator/skynet-telegram-bot");
+});
+
 bot.on("document", async (ctx) => {
   uploadFile(ctx.message.document.file_id, ctx.message.document.file_name, ctx);
 });
@@ -144,7 +148,26 @@ bot.on("text", (ctx) => {
 });
 
 // start telegraf bot
-bot.launch().then(() => {
+bot.launch().then(async () => {
+  const commands = [
+    {
+      command: "help",
+      description: "Show help message",
+    },
+    {
+      command: "source",
+      description: "Show github link",
+    },
+  ];
+
+  // Check if the bot has commands set, if not apply the commands above
+  if ((await bot.telegram.getMyCommands()).length < 1) {
+    console.log("No commands found, adding default");
+    await bot.telegram
+      .setMyCommands(commands)
+      .then(() => console.log("Commands set"))
+      .catch(console.error);
+  }
   console.log("Bot ready!");
   console.log(`Add me: https://t.me/${bot.options.username}`);
 });
