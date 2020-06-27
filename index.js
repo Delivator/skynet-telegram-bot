@@ -68,7 +68,6 @@ async function uploadText(ctx) {
   axios
     .post(apiUrl + "?filename=" + filename, ctx.message.text, {
       maxContentLength: Infinity,
-      // headers: { "content-type": "plain/text" },
     })
     .then((resp) => {
       ctx.telegram.editMessageText(
@@ -94,15 +93,39 @@ bot.on("document", async (ctx) => {
 
 bot.on("photo", (ctx) => {
   let file = ctx.message.photo.slice(-1).pop().file_id;
-  uploadFile(file, `photo_${ctx.message.date}.jpg`, ctx);
+  uploadFile(file, `telegram-photo_${ctx.message.date}.jpg`, ctx);
 });
 
 bot.on("voice", (ctx) => {
-  uploadFile(ctx.message.voice.file_id, `audio_${ctx.message.date}.ogg`, ctx);
+  uploadFile(
+    ctx.message.voice.file_id,
+    `telegram-audio_${ctx.message.date}.ogg`,
+    ctx
+  );
+});
+
+bot.on("audio", (ctx) => {
+  uploadFile(
+    ctx.message.audio.file_id,
+    `telegram-audio_${ctx.message.date}.mp3`,
+    ctx
+  );
 });
 
 bot.on("video", (ctx) => {
-  uploadFile(ctx.message.video.file_id, `video_${ctx.message.date}.mp4`, ctx);
+  uploadFile(
+    ctx.message.video.file_id,
+    `telegram-video_${ctx.message.date}.mp4`,
+    ctx
+  );
+});
+
+bot.on("video_note", (ctx) => {
+  uploadFile(
+    ctx.message.video_note.file_id,
+    `telegram-video_${ctx.message.date}.mp4`,
+    ctx
+  );
 });
 
 bot.on("text", (ctx) => {
@@ -110,6 +133,6 @@ bot.on("text", (ctx) => {
 });
 
 bot.launch().then(() => {
-  console.log("Bot ready!", bot);
-  console.log(`Add me with: http://t.me/${bot.options.username}`);
+  console.log("Bot ready!");
+  console.log(`Add me: https://t.me/${bot.options.username}`);
 });
