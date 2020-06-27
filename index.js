@@ -56,16 +56,16 @@ async function uploadFile(fileId, filename, ctx) {
       })
       .catch(console.error);
   } catch (error) {
-    console.error(error);
-    if (!reply) return;
     // handle telegram 20mb donwload filesize limit
-    if (error.message === "400: Bad Request: file is too big")
+    if (error.message === "400: Bad Request: file is too big") {
+      if (!reply) return;
       ctx.telegram.editMessageText(
         ctx.chat.id,
         reply.message_id,
         null,
         "Error: File too big.\nTelegram has a 20MB filesize limit for bots."
       );
+    } else console.error(error);
   }
 }
 
