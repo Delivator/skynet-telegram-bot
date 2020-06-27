@@ -3,7 +3,7 @@ A Telegram bot for uploading files and text to [Sia Skynet.](https://siasky.net/
 
 ### Try it out now [t.me/skyportalxyz_bot](https://t.me/skyportalxyz_bot)
 
-Example video: https://cdn.skyportal.xyz/_AmTIY8U4NNTakKxGDxWN3YNP4hTWoTbUSzjWzNoObFZ5Q
+Example video: https://cdn.skyportal.xyz/AADEJEQgbH1mZJux_5BOcTS3ZYQYOgh_NYNoi_F6eqIRpg
 
 ![Telegram Bot Gif](https://cdn.skyportal.xyz/_A4ztg7APbf-j9arVX7V0qrAaFRWEeOMEYGMWKj5hpEq7w)
 
