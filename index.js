@@ -16,42 +16,50 @@ const limitConfig = {
     ),
 };
 
+// takes a telegram file id, downloads the file and uploads it to skynet
 async function uploadFile(fileId, filename, ctx) {
-  let reply = await ctx.reply(`Downloading file...`, {
-    reply_to_message_id: ctx.message.message_id,
-  });
-  ctx.telegram
-    .getFileLink(fileId)
-    .then((url) => {
-      axios
-        .get(url, { responseType: "arraybuffer" })
-        .then((response) => {
+  try {
+    let reply = await ctx.reply(`Downloading file...`, {
+      reply_to_message_id: ctx.message.message_id,
+    });
+    let url = await ctx.telegram.getFileLink(fileId); // get telegram file url
+    let response = await axios.get(url, { responseType: "stream" }); // download file
+    ctx.telegram.editMessageText(
+      ctx.chat.id,
+      reply.message_id,
+      null,
+      "Uploading to Skynet..."
+    );
+    // upload to skynet
+    axios
+      .post(apiUrl + "?filename=" + filename, response.data, {
+        maxContentLength: Infinity,
+      })
+      .then((resp) => {
+        if (resp.status !== 200) {
           ctx.telegram.editMessageText(
             ctx.chat.id,
             reply.message_id,
             null,
-            "Uploading to Skynet..."
+            "Error while uploading file to skynet ☹️"
           );
-          axios
-            .post(apiUrl + "?filename=" + filename, response.data, {
-              maxContentLength: Infinity,
-            })
-            .then((resp) => {
-              ctx.telegram.editMessageText(
-                ctx.chat.id,
-                reply.message_id,
-                null,
-                `${settings.portalUrl}/${resp.data.skylink}`,
-                { disable_web_page_preview: true }
-              );
-            })
-            .catch(console.error);
-        })
-        .catch(console.error);
-    })
-    .catch(console.error);
+        }
+        // update reply with skylink
+        ctx.telegram.editMessageText(
+          ctx.chat.id,
+          reply.message_id,
+          null,
+          `${settings.portalUrl}/${resp.data.skylink}`,
+          { disable_web_page_preview: true }
+        );
+      })
+      .catch(console.error);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
+// upload string as a textfile to skynet
 async function uploadText(ctx) {
   let filename = `text_${new Date().getTime()}.txt`;
   let reply = await ctx.reply(`Uploading text...`, {
@@ -101,4 +109,7 @@ bot.on("text", (ctx) => {
   uploadText(ctx);
 });
 
-bot.launch();
+bot.launch().then(() => {
+  console.log("Bot ready!", bot);
+  console.log(`Add me with: http://t.me/${bot.options.username}`);
+});
