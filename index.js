@@ -56,9 +56,15 @@ async function uploadFile(fileId, filename, ctx) {
       })
       .catch(console.error);
   } catch (error) {
+    if (!reply) return;
+    ctx.telegram.editMessageText(
+      ctx.chat.id,
+      reply.message_id,
+      null,
+      "Error while uploading file to skynet ☹️"
+    );
     // handle telegram 20mb donwload filesize limit
     if (error.message === "400: Bad Request: file is too big") {
-      if (!reply) return;
       ctx.telegram.editMessageText(
         ctx.chat.id,
         reply.message_id,
@@ -71,12 +77,23 @@ async function uploadFile(fileId, filename, ctx) {
 
 // upload string as a textfile to skynet
 async function uploadText(ctx) {
-  let filename = `text_${new Date().getTime()}.txt`;
-  let reply = await ctx
-    .reply(`Uploading text...`, {
+  let reply;
+  try {
+    reply = await ctx.reply(`Uploading text...`, {
       reply_to_message_id: ctx.message.message_id,
-    })
-    .catch(console.error);
+    });
+  } catch (error) {
+    if (!reply) return;
+    console.error(error);
+    ctx.telegram.editMessageText(
+      ctx.chat.id,
+      reply.message_id,
+      null,
+      "Error while uploading text to skynet ☹️"
+    );
+  }
+
+  let filename = `text_${new Date().getTime()}.txt`;
   axios
     .post(apiUrl + "?filename=" + filename, ctx.message.text, {
       maxContentLength: Infinity,
