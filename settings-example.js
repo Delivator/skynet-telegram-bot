@@ -1,6 +1,6 @@
 module.exports = {
   telegramBotToken: "012345678:abcdefghijklmnopqrstuvwxyzABCDEFGHI",
-  portalUrl: "https://siasky.dev",
+  portalUrl: "https://skyportal.xyz",
   startMsg:
     "I will upload anything you send to me to Sia Skynet.\n" +
     "Send me a photo, video, voice/video memo, document or text message and I will upload it to SkyPortal.xyz!\n\n" +

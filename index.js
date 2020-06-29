@@ -149,6 +149,10 @@ bot.on("text", (ctx) => {
   uploadText(ctx);
 });
 
+bot.catch((err, ctx) => {
+  console.log(`Telegraf encountered an error for ${ctx.updateType}`, err);
+});
+
 // start telegraf bot
 bot.launch().then(async () => {
   const commands = [
