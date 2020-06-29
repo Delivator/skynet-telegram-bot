@@ -92,7 +92,9 @@ async function uploadText(ctx) {
 }
 
 // telegraf bot events
-bot.start((ctx) => ctx.reply(settings.helpMsg));
+bot.start((ctx) =>
+  ctx.reply(settings.startMsg, { disable_web_page_preview: true })
+);
 
 bot.use(rateLimit(limitConfig));
 
@@ -156,11 +158,11 @@ bot.launch().then(async () => {
     },
     {
       command: "source",
-      description: "Show github link",
+      description: "Show GitHub link",
     },
   ];
 
-  // Check if the bot has commands set, if not apply the commands above
+  // Check if the bot has commands set, if not apply the default commands above
   if ((await bot.telegram.getMyCommands()).length < 1) {
     console.log("No commands found, adding default");
     await bot.telegram

@@ -1,6 +1,6 @@
 {
   "name": "skynet-telegram-bot",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A Telegram bot written in Node.js for uploading stuff to Sia Skynet.",
   "main": "index.js",
   "scripts": {
