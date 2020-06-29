@@ -72,9 +72,11 @@ async function uploadFile(fileId, filename, ctx) {
 // upload string as a textfile to skynet
 async function uploadText(ctx) {
   let filename = `text_${new Date().getTime()}.txt`;
-  let reply = await ctx.reply(`Uploading text...`, {
-    reply_to_message_id: ctx.message.message_id,
-  });
+  let reply = await ctx
+    .reply(`Uploading text...`, {
+      reply_to_message_id: ctx.message.message_id,
+    })
+    .catch(console.error);
   axios
     .post(apiUrl + "?filename=" + filename, ctx.message.text, {
       maxContentLength: Infinity,
