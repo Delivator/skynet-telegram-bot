@@ -82,6 +82,20 @@ async function uploadText(ctx) {
     reply = await ctx.reply(`Uploading text...`, {
       reply_to_message_id: ctx.message.message_id,
     });
+    let filename = `text_${new Date().getTime()}.txt`;
+    axios
+      .post(apiUrl + "?filename=" + filename, ctx.message.text, {
+        maxContentLength: Infinity,
+      })
+      .then((resp) => {
+        ctx.telegram.editMessageText(
+          ctx.chat.id,
+          reply.message_id,
+          null,
+          `${settings.portalUrl}/${resp.data.skylink}`,
+          { disable_web_page_preview: true }
+        );
+      });
   } catch (error) {
     if (!reply) return;
     console.error(error);
@@ -92,22 +106,6 @@ async function uploadText(ctx) {
       "Error while uploading text to skynet ☹️"
     );
   }
-
-  let filename = `text_${new Date().getTime()}.txt`;
-  axios
-    .post(apiUrl + "?filename=" + filename, ctx.message.text, {
-      maxContentLength: Infinity,
-    })
-    .then((resp) => {
-      ctx.telegram.editMessageText(
-        ctx.chat.id,
-        reply.message_id,
-        null,
-        `${settings.portalUrl}/${resp.data.skylink}`,
-        { disable_web_page_preview: true }
-      );
-    })
-    .catch(console.error);
 }
 
 // telegraf bot events
