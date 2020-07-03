@@ -162,6 +162,13 @@ bot.on("video_note", (ctx) => {
   );
 });
 
+bot.on("sticker", (ctx) => {
+  const filename = ctx.message.sticker.is_animated
+    ? `animated-telegram-sticker_${ctx.message.date}.tgs`
+    : `telegram-sticker_${ctx.message.date}.webp`;
+  uploadFile(ctx.message.sticker.file_id, filename, ctx);
+});
+
 bot.on("text", (ctx) => {
   uploadText(ctx);
 });
