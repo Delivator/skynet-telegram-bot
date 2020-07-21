@@ -6,15 +6,83 @@ const rateLimit = require("telegraf-ratelimit");
 const apiUrl = settings.portalUrl + "/skynet/skyfile";
 const bot = new Telegraf(settings.telegramBotToken);
 
+// empty albums object used to store multiple photos and videos from an album
+let albums = {};
+
 // config for telegraf ratelimit middleware
 const limitConfig = {
   window: settings.rateLimitTime,
   limit: 1,
-  onLimitExceeded: (ctx) =>
+  onLimitExceeded: (ctx) => {
+    if (ctx.message.media_group_id) return handleMediaGroup(ctx);
     ctx.reply(
       `Rate limit exceeded. Max 1 upload per ${settings.rateLimitTime / 1000}s`
-    ),
+    );
+  },
 };
+
+function filesToBlobs(files, ctx) {
+  return new Promise((resolve, reject) => {
+    if (!files || files.length < 2) return reject("No files provided.");
+    let fileBlobs = [];
+    files.forEach(async (fileId) => {
+      try {
+        let url = await ctx.telegram.getFileLink(fileId); // get telegram file url
+        axios.get(url, { responseType: "stream" }).then((response) => {
+          fileBlobs.push(response.data);
+          if (fileBlobs.length === files.length) resolve(fileBlobs);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+}
+
+// uploads all files from an media group to skygallery
+async function uploadAlbum(id, ctx) {
+  let reply;
+  try {
+    reply = await ctx.reply(
+      `Uploading ${albums[id].files.length} files to SkyGallery...`
+    );
+    let blobs = await filesToBlobs(albums[id].files, ctx);
+    ctx.telegram.editMessageText(
+      ctx.chat.id,
+      reply.message_id,
+      null,
+      `${blobs.length} files downloaded.`
+    );
+    delete albums[id];
+  } catch (error) {
+    console.error(error);
+    delete albums[id];
+    if (!reply) return;
+    ctx.telegram.editMessageText(
+      ctx.chat.id,
+      reply.message_id,
+      null,
+      "Error while uploading files to skynet ☹️"
+    );
+  }
+}
+
+// pushes all media ids of a media group in an object
+function handleMediaGroup(ctx) {
+  const media_group_id = ctx.message.media_group_id;
+  if (!albums[media_group_id]) albums[media_group_id] = { files: [] };
+  let album = albums[ctx.message.media_group_id];
+
+  if (album.timeout) clearTimeout(album.timeout);
+  album.timeout = setTimeout(uploadAlbum, 100, media_group_id, ctx);
+
+  if (ctx.message.photo) {
+    let file = ctx.message.photo.slice(-1).pop().file_id;
+    album.files.push(file);
+  } else if (ctx.message.video) {
+    album.files.push(ctx.message.video.file_id);
+  }
+}
 
 // takes a telegram file id, downloads the file and uploads it to skynet
 async function uploadFile(fileId, filename, ctx) {
@@ -126,8 +194,18 @@ bot.on("document", async (ctx) => {
 });
 
 bot.on("photo", (ctx) => {
+  if (ctx.message.media_group_id) return handleMediaGroup(ctx);
   let file = ctx.message.photo.slice(-1).pop().file_id;
   uploadFile(file, `telegram-photo_${ctx.message.date}.jpg`, ctx);
+});
+
+bot.on("video", (ctx) => {
+  if (ctx.message.media_group_id) return handleMediaGroup(ctx);
+  uploadFile(
+    ctx.message.video.file_id,
+    `telegram-video_${ctx.message.date}.mp4`,
+    ctx
+  );
 });
 
 bot.on("voice", (ctx) => {
@@ -142,14 +220,6 @@ bot.on("audio", (ctx) => {
   uploadFile(
     ctx.message.audio.file_id,
     `telegram-audio_${ctx.message.date}.mp3`,
-    ctx
-  );
-});
-
-bot.on("video", (ctx) => {
-  uploadFile(
-    ctx.message.video.file_id,
-    `telegram-video_${ctx.message.date}.mp4`,
     ctx
   );
 });
