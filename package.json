@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Delivator/skynet-telegram-bot#readme",
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.4",
     "telegraf": "^3.38.0",
     "telegraf-ratelimit": "^2.0.0"
   },
